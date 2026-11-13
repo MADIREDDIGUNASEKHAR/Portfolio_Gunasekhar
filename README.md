@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Guna Sekhar Madireddi — Portfolio
 
-## Getting Started
+Personal portfolio for a full-stack engineer. Next.js 16 (App Router, statically prerendered), TypeScript, Tailwind CSS v4, React Three Fiber, GSAP ScrollTrigger, Motion and Lenis.
 
-First, run the development server:
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # production build (all pages prerendered)
+npm start          # serve the production build
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Set `NEXT_PUBLIC_SITE_URL` (e.g. `https://your-domain.com`) when deploying so canonical URLs, Open Graph, `sitemap.xml` and `robots.txt` point at the right host.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Editing content
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All copy lives outside the UI, so you rarely need to touch components:
 
-## Learn More
+| What | File |
+| --- | --- |
+| Name, email, phone, GitHub, **LinkedIn**, resume path, location | `config/site.ts` |
+| Work experience, metrics, engineering breakdowns, education | `data/experience.ts` |
+| Projects — summary, highlights, architecture diagram, decisions, challenges, code sketches | `data/projects.ts` |
+| Skills, the "where I used it" context, and constellation links | `data/skills.ts` |
+| About interests, stats, engineering-philosophy steps | `data/about.ts` |
+| Resume PDF | `public/resume/Guna_Sekhar_Madireddi_Resume.pdf` |
 
-To learn more about Next.js, take a look at the following resources:
+**LinkedIn:** set `siteConfig.linkedin.url` to your profile URL and `isProfileUrl: true`. Until then the link opens a LinkedIn people search for your name.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Adding a project to `data/projects.ts` automatically creates its `/work/<slug>` case-study page, adds it to the sitemap, and renders its architecture diagram from the `nodes`/`edges` you define. The `visual` field picks one of the four live visualizations in `components/projects/visuals/`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Structure
 
-## Deploy on Vercel
+```
+app/                 routes: home, /work/[slug] case studies, OG image, sitemap, robots, 404
+components/
+  layout/            providers (Lenis + GSAP sync), footer, marquee
+  navigation/        floating nav, theme toggle
+  hero/              hero, rotating text, lazy 3D loader
+  three/             R3F systems scene + static SVG fallback
+  about/ experience/ projects/ skills/ philosophy/ contact/
+  ui/                buttons, magnetic, reveal, tilt card, icons
+config/ data/        all content
+hooks/ lib/          media queries, in-view, loop clock, theme store, scroll, gsap
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Performance and accessibility notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- The WebGL scene is code-split and mounted only after the browser is idle. It cross-fades from a static SVG, renders only while visible, adapts DPR under load, and uses fewer nodes, packets and particles on mobile. Without WebGL, or if the renderer fails, the SVG stays in place.
+- Every canvas and SVG animation pauses offscreen. With `prefers-reduced-motion`, smooth scrolling, the pinned horizontal sequence and looping simulations are turned off and the layouts switch to static equivalents.
+- The theme is applied by an inline script before first paint (no flash), saved in `localStorage`, and switched with a View Transitions circular reveal where supported.
