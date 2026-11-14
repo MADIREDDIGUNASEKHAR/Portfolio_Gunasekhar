@@ -14,6 +14,14 @@ npm run lint
 
 Set `NEXT_PUBLIC_SITE_URL` (e.g. `https://your-domain.com`) when deploying so canonical URLs, Open Graph, `sitemap.xml` and `robots.txt` point at the right host.
 
+## Page-view counter
+
+The footer shows total portfolio views, today's views, and a 14-day trend. Data comes from `GET/POST /api/views` (`app/api/views/route.ts`, storage in `lib/views-store.ts`).
+
+- **How views are counted:** one view per browser session, so refreshes and moving between pages don't add more. Common bots and crawlers are ignored. Only totals are stored: no IP addresses, cookies or personal data.
+- **Local / `next start` on your machine:** counts are saved in `.data/views.json`, which is gitignored. Delete that file to reset.
+- **Production (Vercel):** serverless hosts have no permanent disk, so connect a free **Upstash Redis** database: Vercel project → **Storage** → **Upstash for Redis** → connect, then redeploy. Its environment variables (`KV_REST_API_URL` / `KV_REST_API_TOKEN` or `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`) are picked up automatically. Until a database is connected, the counter stays hidden instead of showing numbers that reset.
+
 ## Editing content
 
 All copy lives outside the UI, so you rarely need to touch components:

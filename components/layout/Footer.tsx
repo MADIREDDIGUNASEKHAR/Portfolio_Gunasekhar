@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Monogram } from "@/components/ui/BrandIcons";
 import { siteConfig } from "@/config/site";
 import { scrollToSection } from "@/lib/scroll";
+import { ViewCounter } from "./ViewCounter";
 
 function LocalTime() {
   const [time, setTime] = useState<string | null>(null);
@@ -21,6 +22,9 @@ function LocalTime() {
 export function Footer() {
   return (
     <footer className="border-t border-line">
+      <div className="container-x">
+        <ViewCounter />
+      </div>
       <div className="container-x flex flex-col gap-6 py-8 text-[13px] text-muted sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <Monogram size={26} />
